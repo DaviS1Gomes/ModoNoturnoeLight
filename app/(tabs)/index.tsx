@@ -1,70 +1,118 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Button, Switch, BackHandler } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+import Slider from '@react-native-community/slider';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const App = () => {
+  const [tema, setTema] = useState('Claro');
+  const [tamanhoFonte, setTamanhoFonte] = useState(16);
+  const [modoNoturno, setModoNoturno] = useState(false);
 
-export default function HomeScreen() {
+  const resetarPreferencias = () => {
+    setTema('Claro');
+    setTamanhoFonte(16);
+    setModoNoturno(false);
+  };
+
+  // Função que retorna o estilo do contêiner com base nas preferências
+  const getContainerStyle = () => {
+    return {
+      flex: 1,
+      padding: 20,
+      justifyContent: 'center', // Centraliza verticalmente
+      alignItems: 'center',     // Centraliza horizontalmente
+      backgroundColor: modoNoturno || tema === 'Escuro' ? '#590D8C' : '#BCF2FF',
+    };
+  };
+
+  const getMainContainerStyle = () =>({
+    backgroundColor: modoNoturno || tema === 'Escuro' ? '#380759' : '#35717F' 
+  } 
+)
+
+  // Função que retorna a cor e o tamanho do texto com base nas preferências
+  const getTextStyle = () => ({
+    color: modoNoturno || tema === 'Escuro' ? '#FFF' : '#BCF2FF',
+    fontSize: tamanhoFonte,
+  });
+
+  // Função que retorna o estilo dos componentes de entrada (Picker e Slider)
+  const getInputStyle = () => ({
+    color: modoNoturno || tema === 'Escuro' ? '#fff' : '#000',
+    fontSize: tamanhoFonte,
+    backgroundColor: modoNoturno || tema === 'Escuro' ? '#6B12A6' : '#70E4FF',
+  });
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <View style ={getContainerStyle()}>
+      <View style={[styles.container, getMainContainerStyle()]}>
+      <Text style={[styles.titulo, getTextStyle()]}>Configurações de Preferências</Text>
+
+      <Text style={[styles.label, getTextStyle()]}>Tema:</Text>
+      <Picker
+        selectedValue={tema}
+        style={[styles.picker, getInputStyle()]}
+        onValueChange={(itemValue) => setTema(itemValue)}
+      >
+        <Picker.Item label="Claro" value="Claro" />
+        <Picker.Item label="Escuro" value="Escuro" />
+        <Picker.Item label="Automático" value="Automático" />
+      </Picker>
+
+      <Text style={[styles.label, getTextStyle()]}>Tamanho da Fonte: {tamanhoFonte}</Text>
+      <Slider
+        style={[styles.slider, getInputStyle()]}
+        minimumValue={12}
+        maximumValue={30}
+        step={1}
+        value={tamanhoFonte}
+        onValueChange={(value) => setTamanhoFonte(value)}
+      />
+
+      <Text style={[styles.label, getTextStyle()]}>
+        Modo Noturno: {modoNoturno ? 'Ativado' : 'Desativado'}
+      </Text>
+      <Switch value={modoNoturno} onValueChange={(value) => setModoNoturno(value)} />
+
+      <View style={styles.botaoContainer}>
+        <Button
+          title="Resetar Preferências"
+          color={modoNoturno || tema === 'Escuro' ? '#8E1ED9' : '#70E4FF'}
+          onPress={resetarPreferencias}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      </View>
+      </View>
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  titulo: {
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  container:{
+    width: '100%',
+    padding: 20,
+    borderRadius: 20,
+  },
+  label: {
+    marginVertical: 10,
+  },
+  picker: {
+    height: 50,
+    width: '100%',
+  },
+  slider: {
+    height: 40,
+    borderRadius: 5
+  },
+  botaoContainer: {
+    marginTop: 20,
+    width: '100%',
     alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+    borderRadius: 20
   },
 });
+
+export default App;
